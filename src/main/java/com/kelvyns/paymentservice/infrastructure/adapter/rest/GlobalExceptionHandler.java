@@ -1,6 +1,7 @@
 package com.kelvyns.paymentservice.infrastructure.adapter.rest;
 
 import com.kelvyns.paymentservice.domain.exception.InvalidAmountException;
+import com.kelvyns.paymentservice.domain.exception.PaymentValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,22 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidAmountException.class)
     public ResponseEntity<ErrorResponse> handleInvalidAmountException(
             InvalidAmountException ex,
+            HttpServletRequest request) {
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+    
+    @ExceptionHandler(PaymentValidationException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentValidationException(
+            PaymentValidationException ex,
             HttpServletRequest request) {
         
         ErrorResponse errorResponse = new ErrorResponse(
